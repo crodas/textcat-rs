@@ -67,7 +67,10 @@ impl FileContent {
     }
 
     /// Returns a sorted list of categories which are candidates and their score (the lower the better)
-    pub fn get_categories(&self, sample: &str) -> Option<Vec<(String, u64)>> {
+    pub fn get_categories(
+        &self,
+        sample: &str,
+    ) -> Option<Vec<(String, u64)>> {
         let ngrams = Ngrams::new(sample, 4);
 
         let mut categories = self
@@ -79,7 +82,8 @@ impl FileContent {
         categories.sort_by(|a, b| a.0.cmp(&b.0));
 
         let best_candidate = categories.first()?;
-        let threshold: u64 = (self.threshold * best_candidate.0 as f32) as u64;
+        let threshold: u64 =
+            (self.threshold * best_candidate.0 as f32) as u64;
 
         Some(
             categories
@@ -128,9 +132,15 @@ pub fn learn_from_directory(path: &str) -> IOResult<FileContent> {
     for p in files {
         let mut buf: Vec<u8> = Vec::new();
 
-        let p = p.map_err(|_e| Error::new(ErrorKind::InvalidData, "failed reading glob path"))?;
+        let p = p.map_err(|_e| {
+            Error::new(
+                ErrorKind::InvalidData,
+                "failed reading glob path",
+            )
+        })?;
 
-        let _bytes = File::open(p.as_path())?.read_to_end(&mut buf)?;
+        let _bytes =
+            File::open(p.as_path())?.read_to_end(&mut buf)?;
         let name = p.as_path().file_stem().unwrap().to_str().unwrap();
 
         let str = String::from_utf8_lossy(&buf).to_string();
@@ -143,15 +153,18 @@ pub fn learn_from_directory(path: &str) -> IOResult<FileContent> {
 
 /// Returns all sample files in a given directory
 fn get_files_from_directory(path: &str) -> IOResult<Paths> {
-    glob(format!("{}/*.sample", path).as_str())
-        .map_err(|_p| Error::new(ErrorKind::InvalidData, "invalid data"))
+    glob(format!("{}/*.sample", path).as_str()).map_err(|_p| {
+        Error::new(ErrorKind::InvalidData, "invalid data")
+    })
 }
 
 mod test {
     #[allow(unused_imports)]
     use crate::default::languages;
     #[allow(unused_imports)]
-    use crate::storage::{get_files_from_directory, learn_from_directory};
+    use crate::storage::{
+        get_files_from_directory, learn_from_directory,
+    };
 
     #[test]
     fn test_files_listing_in_path() {
@@ -161,7 +174,10 @@ mod test {
             .map(|p| p.to_str().clone().unwrap().to_string())
             .collect();
 
-        assert_eq!(vec!["tests/english.sample", "tests/spanish.sample",], r);
+        assert_eq!(
+            vec!["tests/english.sample", "tests/spanish.sample",],
+            r
+        );
     }
 
     #[test]

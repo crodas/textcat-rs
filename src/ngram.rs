@@ -44,7 +44,8 @@ impl<'de> Deserialize<'de> for Ngrams {
     where
         D: Deserializer<'de>,
     {
-        let ngrams: Vec<Ngram> = Deserialize::deserialize(deserializer)?;
+        let ngrams: Vec<Ngram> =
+            Deserialize::deserialize(deserializer)?;
         Ok(Ngrams::from_vec(ngrams))
     }
 }
@@ -133,7 +134,11 @@ impl Ngrams {
     pub fn distance(&self, another: &Ngrams) -> u64 {
         self.ngrams
             .iter()
-            .map(|n| another.position(n.ngram()).map_or(5000_u64, |v| v as u64))
+            .map(|n| {
+                another
+                    .position(n.ngram())
+                    .map_or(5000_u64, |v| v as u64)
+            })
             .sum()
     }
 
@@ -189,8 +194,14 @@ mod tests {
             4,
         );
         assert_eq!(4, ngrams.get(0).value());
-        assert_eq!(2, ngrams.ngram(&"is".to_string()).unwrap().value());
-        assert_eq!(1, ngrams.ngram(&"this".to_string()).unwrap().value());
+        assert_eq!(
+            2,
+            ngrams.ngram(&"is".to_string()).unwrap().value()
+        );
+        assert_eq!(
+            1,
+            ngrams.ngram(&"this".to_string()).unwrap().value()
+        );
     }
 
     #[test]
