@@ -2,6 +2,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::min;
 use std::collections::HashMap;
 use std::iter::FromIterator;
+use unicode_segmentation::UnicodeSegmentation;
 
 pub struct Ngram((String, u64));
 
@@ -98,7 +99,7 @@ impl Ngrams {
         let mut ngrams: HashMap<String, u64> = HashMap::new();
         let text: Vec<char> = text
             .to_lowercase()
-            .split_whitespace()
+            .unicode_words()
             .fold(String::new(), |a, b| a + "_" + b)
             .chars()
             .collect::<Vec<_>>();
@@ -184,7 +185,7 @@ mod tests {
             4,
         );
 
-        assert_eq!(156, ngrams.len());
+        assert_eq!(146, ngrams.len());
     }
 
     #[test]
