@@ -16,6 +16,19 @@ impl Category {
     pub fn distance(&self, ngrams: &Ngrams) -> u64 {
         self.ngrams.distance(ngrams)
     }
+
+    /// Creates a struct from a vector (the output of self.to_vec())
+    pub fn from_vec(name: &str, ngrams: Vec<&str>) -> Self {
+        Category {
+            name: name.to_string(),
+            ngrams: Ngrams::from_vec_str(ngrams),
+        }
+    }
+
+    /// Exports the current structure as a vector
+    pub fn to_vec(&self) -> Vec<&str> {
+        self.ngrams.to_vec()
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -50,7 +63,33 @@ impl FileContent {
         }
     }
 
-    fn default_threshold() -> f32 {
+    /// Converts an vector into a struct (the output of self.to_vec())
+    pub fn from_vec(data: Vec<(&str, Vec<&str>)>) -> FileContent {
+        let categories = data
+            .iter()
+            .map(|(name, ngrams)| {
+                Category::from_vec(name, ngrams.to_vec())
+            })
+            .collect();
+
+        FileContent {
+            categories,
+            version: env!("CARGO_PKG_VERSION").to_string(),
+            threshold: FileContent::default_threshold(),
+        }
+    }
+
+    /// Converts the current structure into a vector (language, [ngrams])
+    pub fn to_vec(&self) -> Vec<(&str, Vec<&str>)> {
+        self.categories
+            .iter()
+            .map(|category| {
+                (category.name.as_str(), category.to_vec())
+            })
+            .collect()
+    }
+
+    pub fn default_threshold() -> f32 {
         1.03
     }
 
@@ -159,8 +198,6 @@ fn get_files_from_directory(path: &str) -> IOResult<Paths> {
 }
 
 mod test {
-    #[allow(unused_imports)]
-    use crate::default::languages;
     #[allow(unused_imports)]
     use crate::storage::{
         get_files_from_directory, learn_from_directory,
