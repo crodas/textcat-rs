@@ -39,7 +39,39 @@ pub enum Language {
 impl FromStr for Language {
     type Err = String;
 
-    fn from_str(name: &str) -> Result<Language, String> {
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::Albanian => "albanian",
+            Self::Arabic => "arabic",
+            Self::Catalan => "catalan",
+            Self::Chinese => "chinese",
+            Self::Danish => "danish",
+            Self::Dutch => "dutch",
+            Self::English => "english",
+            Self::Esperanto => "esperanto",
+            Self::Estonian => "estonian",
+            Self::Euskara => "euskara",
+            Self::Finnish => "finnish",
+            Self::French => "french",
+            Self::German => "german",
+            Self::Guarani => "guarani",
+            Self::Hebrew => "hebrew",
+            Self::Irish => "irish",
+            Self::Italian => "italian",
+            Self::Japanese => "japanese",
+            Self::Ladino => "ladino",
+            Self::Latin => "latin",
+            Self::Norwegian => "norwegian",
+            Self::Persian => "persian",
+            Self::Portuguese => "portuguese",
+            Self::Romanian => "romanian",
+            Self::Spanish => "spanish",
+            Self::Swedish => "swedish",
+            Self::Welsh => "welsh",
+        }
+    }
+
+    pub fn from_str(name: &str) -> Result<Language, String> {
         match name.to_lowercase().as_str() {
             "albanian" => Ok(Self::Albanian),
             "arabic" => Ok(Self::Arabic),
@@ -107,7 +139,7 @@ impl TextCat {
     pub fn get_embed_languages() -> FileContent {
         FileContent::from_vec(vec![
             (
-                "albanian",
+                Language::Albanian.name(),
                 vec![
                     "ë_", "e_", "të", "_t", "të_", "_n", "sh", "_p",
                     "_s", "a_", "i_", "ër", "te", "_m", "_k", "r_",
@@ -172,7 +204,7 @@ impl TextCat {
                 ],
             ),
             (
-                "arabic",
+                Language::Arabic.name(),
                 vec![
                     "ال",
                     "ي_",
@@ -577,7 +609,7 @@ impl TextCat {
                 ],
             ),
             (
-                "catalan",
+                Language::Catalan.name(),
                 vec![
                     "a_", "s_", "_d", "es", "e_", "de", "_de", "_l",
                     "_e", "l_", "_c", "_a", "t_", "es_", "en", "el",
@@ -642,7 +674,7 @@ impl TextCat {
                 ],
             ),
             (
-                "chinese",
+                Language::Chinese.name(),
                 vec![
                     "球_",
                     "_球_",
@@ -1047,7 +1079,7 @@ impl TextCat {
                 ],
             ),
             (
-                "danish",
+                Language::Danish.name(),
                 vec![
                     "e_", "er", "de", "r_", "en", "t_", "_d", "er_",
                     "n_", "_a", "re", "_de", "et", "te", "_e", "_s",
@@ -1111,7 +1143,7 @@ impl TextCat {
                 ],
             ),
             (
-                "dutch",
+                Language::Dutch.name(),
                 vec![
                     "n_", "en", "e_", "en_", "t_", "de", "er", "_d",
                     "an", "_v", "ge", "in", "r_", "et", "te", "ij",
@@ -1175,7 +1207,7 @@ impl TextCat {
                 ],
             ),
             (
-                "english",
+                Language::English.name(),
                 vec![
                     "e_", "_t", "th", "s_", "_th", "_a", "he", "the",
                     "in", "_the", "n_", "_i", "t_", "d_", "he_",
@@ -1239,7 +1271,7 @@ impl TextCat {
                 ],
             ),
             (
-                "esperanto",
+                Language::Esperanto.name(),
                 vec![
                     "o_", "n_", "a_", "s_", "e_", "_k", "_p", "as",
                     "i_", "as_", "_s", "_m", "in", "en", "_v", "la",
@@ -1301,7 +1333,7 @@ impl TextCat {
                 ],
             ),
             (
-                "estonian",
+                Language::Estonian.name(),
                 vec![
                     "a_", "e_", "_k", "s_", "i_", "d_", "_t", "_m",
                     "se", "ma", "is", "t_", "in", "_s", "ta", "as",
@@ -1363,7 +1395,7 @@ impl TextCat {
                 ],
             ),
             (
-                "euskara",
+                Language::Euskara.name(),
                 vec![
                     "a_", "n_", "en", "_e", "ar", "er", "en_", "ra",
                     "an", "re", "ta", "ko", "o_", "rr", "ak", "ri",
@@ -1427,7 +1459,7 @@ impl TextCat {
                 ],
             ),
             (
-                "finnish",
+                Language::Finnish.name(),
                 vec![
                     "n_", "a_", "ta", "an", "st", "in", "en", "is",
                     "_k", "it", "si", "aa", "i_", "tt", "li", "ä_",
@@ -1489,7 +1521,7 @@ impl TextCat {
                 ],
             ),
             (
-                "french",
+                Language::French.name(),
                 vec![
                     "e_", "s_", "_d", "es", "_l", "t_", "on", "le",
                     "de", "es_", "_de", "re", "en", "_p", "n_", "_c",
@@ -1552,7 +1584,7 @@ impl TextCat {
                 ],
             ),
             (
-                "german",
+                Language::German.name(),
                 vec![
                     "er", "en", "n_", "e_", "ch", "en_", "_d", "ei",
                     "de", "r_", "te", "t_", "ie", "in", "er_", "ã_",
@@ -1615,7 +1647,7 @@ impl TextCat {
                 ],
             ),
             (
-                "guarani",
+                Language::Guarani.name(),
                 vec![
                     "a_", "e_", "_o", "ha", "_h", "o_", "pe", "re",
                     "ch", "va", "gu", "ha_", "i_", "_ha", "er", "te",
@@ -1680,7 +1712,7 @@ impl TextCat {
                 ],
             ),
             (
-                "hebrew",
+                Language::Hebrew.name(),
                 vec![
                     "_ה",
                     "ת_",
@@ -2085,7 +2117,7 @@ impl TextCat {
                 ],
             ),
             (
-                "irish",
+                Language::Irish.name(),
                 vec![
                     "_a", "a_", "n_", "an", "h_", "_s", "ai", "ch",
                     "ea", "r_", "_b", "s_", "ar", "_t", "_c", "in",
@@ -2150,7 +2182,7 @@ impl TextCat {
                 ],
             ),
             (
-                "italian",
+                Language::Italian.name(),
                 vec![
                     "a_", "e_", "o_", "i_", "_c", "_s", "_d", "_a",
                     "la", "_p", "er", "ar", "an", "_l", "co", "ri",
@@ -2214,7 +2246,7 @@ impl TextCat {
                 ],
             ),
             (
-                "japanese",
+                Language::Japanese.name(),
                 vec![
                     "の_",
                     "_の_",
@@ -2619,7 +2651,7 @@ impl TextCat {
                 ],
             ),
             (
-                "ladino",
+                Language::Ladino.name(),
                 vec![
                     "a_", "s_", "_d", "e_", "de", "_e", "n_", "en",
                     "_de", "ra", "es", "el", "de_", "la", "_l",
@@ -2683,7 +2715,7 @@ impl TextCat {
                 ],
             ),
             (
-                "latin",
+                Language::Latin.name(),
                 vec![
                     "s_", "e_", "t_", "m_", "qu", "er", "is", "a_",
                     "_i", "_a", "um", "re", "te", "_s", "it", "ue",
@@ -2745,7 +2777,7 @@ impl TextCat {
                 ],
             ),
             (
-                "norwegian",
+                Language::Norwegian.name(),
                 vec![
                     "n_", "r_", "en", "e_", "_h", "er", "t_", "_s",
                     "er_", "an", "en_", "ha", "_ha", "g_", "de",
@@ -2810,7 +2842,7 @@ impl TextCat {
                 ],
             ),
             (
-                "persian",
+                Language::Persian.name(),
                 vec![
                     "ه_",
                     "ی_",
@@ -3215,7 +3247,7 @@ impl TextCat {
                 ],
             ),
             (
-                "portuguese",
+                Language::Portuguese.name(),
                 vec![
                     "o_", "a_", "e_", "s_", "_d", "de", "_a", "es",
                     "os", "_p", "ra", "os_", "do", "_s", "nt", "_de",
@@ -3278,7 +3310,7 @@ impl TextCat {
                 ],
             ),
             (
-                "romanian",
+                Language::Romanian.name(),
                 vec![
                     "e_", "a_", "i_", "in", "_c", "_s", "_d", "ar",
                     "re", "_a", "_p", "de", "ra", "at", "_i", "n_",
@@ -3341,7 +3373,7 @@ impl TextCat {
                 ],
             ),
             (
-                "spanish",
+                Language::Spanish.name(),
                 vec![
                     "e_", "a_", "s_", "de", "_d", "_de", "o_", "_l",
                     "la", "de_", "en", "_de_", "es", "_p", "n_",
@@ -3406,7 +3438,7 @@ impl TextCat {
                 ],
             ),
             (
-                "swedish",
+                Language::Swedish.name(),
                 vec![
                     "a_", "wa", "i_", "_k", "_w", "_wa", "wa_", "_m",
                     "o_", "ka", "ku", "li", "ma", "a_k", "an", "ya",
@@ -3470,7 +3502,7 @@ impl TextCat {
                 ],
             ),
             (
-                "welsh",
+                Language::Welsh.name(),
                 vec![
                     "_y", "n_", "dd", "d_", "yn", "r_", "_a", "yn_",
                     "yd", "th", "l_", "_g", "u_", "_yn", "_d",

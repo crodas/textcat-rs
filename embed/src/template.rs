@@ -14,7 +14,14 @@ pub enum Language {
 impl FromStr for Language {
     type Err = String;
 
-    fn from_str(name: &str) -> Result<Language, String> {
+    pub fn name(&self) -> &'static str {
+        match self {
+            {% for lang in languages %}
+            Self::{{lang|capitalize}} => "{{lang}}",{% endfor %}
+        }
+    }
+
+    pub fn from_str(name: &str) -> Result<Language, String> {
         match name.to_lowercase().as_str() {
         {% for lang in languages %}
             "{{lang}}" => Ok(Self::{{lang|capitalize}}),{% endfor %}
@@ -54,7 +61,7 @@ impl TextCat {
         FileContent::from_vec(vec![
         {% for c in ngrams %}
             (
-                "{{c.0}}",
+                Language::{{c.0|capitalize}}.name(),
                 vec![
                 {% for ngram in c.1|slice(end=400) %}
                     "{{ngram}}",{% endfor %}
