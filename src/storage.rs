@@ -7,7 +7,7 @@ use std::io::{BufReader, Error, ErrorKind, Read, Write};
 pub type IOResult<T> = std::result::Result<T, Error>;
 
 #[derive(Serialize, Deserialize)]
-pub struct Category {
+struct Category {
     name: String,
     ngrams: Ngrams,
 }
@@ -17,6 +17,7 @@ impl Category {
         self.ngrams.distance(ngrams)
     }
 
+    /// Creates a struct from a vector (the output of self.to_vec())
     pub fn from_vec(name: &str, ngrams: Vec<&str>) -> Self {
         Category {
             name: name.to_string(),
@@ -24,6 +25,7 @@ impl Category {
         }
     }
 
+    /// Exports the current structure as a vector
     pub fn to_vec(&self) -> Vec<&str> {
         self.ngrams.to_vec()
     }
@@ -61,6 +63,7 @@ impl FileContent {
         }
     }
 
+    /// Converts an vector into a struct (the output of self.to_vec())
     pub fn from_vec(data: Vec<(&str, Vec<&str>)>) -> FileContent {
         let categories = data
             .iter()
@@ -76,6 +79,7 @@ impl FileContent {
         }
     }
 
+    /// Converts the current structure into a vector (language, [ngrams])
     pub fn to_vec(&self) -> Vec<(&str, Vec<&str>)> {
         self.categories
             .iter()
