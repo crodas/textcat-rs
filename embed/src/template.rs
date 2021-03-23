@@ -11,17 +11,20 @@ pub enum Language {
         {{lang|capitalize}},{% endfor %}
 }
 
-impl FromStr for Language {
-    type Err = String;
-
-    pub fn name(&self) -> &'static str {
+impl Language {
+    fn name(&self) -> &'static str {
         match self {
             {% for lang in languages %}
             Self::{{lang|capitalize}} => "{{lang}}",{% endfor %}
         }
     }
 
-    pub fn from_str(name: &str) -> Result<Language, String> {
+}
+
+impl FromStr for Language {
+    type Err = String;
+
+    fn from_str(name: &str) -> Result<Language, String> {
         match name.to_lowercase().as_str() {
         {% for lang in languages %}
             "{{lang}}" => Ok(Self::{{lang|capitalize}}),{% endfor %}

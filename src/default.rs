@@ -36,10 +36,8 @@ pub enum Language {
     Welsh,
 }
 
-impl FromStr for Language {
-    type Err = String;
-
-    pub fn name(&self) -> &'static str {
+impl Language {
+    fn name(&self) -> &'static str {
         match self {
             Self::Albanian => "albanian",
             Self::Arabic => "arabic",
@@ -70,8 +68,12 @@ impl FromStr for Language {
             Self::Welsh => "welsh",
         }
     }
+}
 
-    pub fn from_str(name: &str) -> Result<Language, String> {
+impl FromStr for Language {
+    type Err = String;
+
+    fn from_str(name: &str) -> Result<Language, String> {
         match name.to_lowercase().as_str() {
             "albanian" => Ok(Self::Albanian),
             "arabic" => Ok(Self::Arabic),
