@@ -81,6 +81,19 @@ impl Ngrams {
         Ngrams::from_vec(ngrams)
     }
 
+    pub fn to_vec(&self) -> Vec<&str> {
+        self.ngrams.iter().map(|w| w.0 .0.as_str()).collect()
+    }
+
+    pub fn from_vec_str(ngrams: Vec<&str>) -> Ngrams {
+        let ngrams = ngrams
+            .iter()
+            .map(|w| Ngram((w.to_string(), 0)))
+            .collect();
+
+        Self::from_vec(ngrams)
+    }
+
     /// Takes a vector of Ngram and builds an index, useful to locate Ngrams quickly
     /// using a hash. This should be called from the deserializer or automatically
     /// from the constructor _if_ we are parsing a new text.

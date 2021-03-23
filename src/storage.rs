@@ -7,7 +7,7 @@ use std::io::{BufReader, Error, ErrorKind, Read, Write};
 pub type IOResult<T> = std::result::Result<T, Error>;
 
 #[derive(Serialize, Deserialize)]
-struct Category {
+pub struct Category {
     name: String,
     ngrams: Ngrams,
 }
@@ -15,6 +15,17 @@ struct Category {
 impl Category {
     pub fn distance(&self, ngrams: &Ngrams) -> u64 {
         self.ngrams.distance(ngrams)
+    }
+
+    pub fn from_vec(name: &str, ngrams: Vec<&str>) -> Self {
+        Category {
+            name: name.to_string(),
+            ngrams: Ngrams::from_vec_str(ngrams),
+        }
+    }
+
+    pub fn to_vec(&self) -> Vec<&str> {
+        self.ngrams.to_vec()
     }
 }
 
@@ -50,7 +61,31 @@ impl FileContent {
         }
     }
 
-    fn default_threshold() -> f32 {
+    pub fn from_vec(data: Vec<(&str, Vec<&str>)>) -> FileContent {
+        let categories = data
+            .iter()
+            .map(|(name, ngrams)| {
+                Category::from_vec(name, ngrams.to_vec())
+            })
+            .collect();
+
+        FileContent {
+            categories,
+            version: env!("CARGO_PKG_VERSION").to_string(),
+            threshold: FileContent::default_threshold(),
+        }
+    }
+
+    pub fn to_vec(&self) -> Vec<(&str, Vec<&str>)> {
+        self.categories
+            .iter()
+            .map(|category| {
+                (category.name.as_str(), category.to_vec())
+            })
+            .collect()
+    }
+
+    pub fn default_threshold() -> f32 {
         1.03
     }
 

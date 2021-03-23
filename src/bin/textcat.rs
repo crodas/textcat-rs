@@ -1,13 +1,13 @@
 use std::env;
 use std::io;
-use textcat::default::languages;
+use textcat::default::TextCat;
 use textcat::storage::load;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
     let db = if args.len() == 1 {
-        languages()
+        TextCat::get_embed_languages()
     } else {
         load(&args[1]).unwrap()
     };
@@ -34,7 +34,7 @@ mod test {
     #[allow(unused_imports)]
     use std::io::BufReader;
     #[allow(unused_imports)]
-    use textcat::default::languages;
+    use textcat::default::TextCat;
 
     #[derive(Deserialize, Serialize)]
     struct Samples {
@@ -49,7 +49,7 @@ mod test {
         let samples: Vec<Samples> =
             serde_json::from_reader(reader).unwrap();
 
-        let textcat = languages();
+        let textcat = TextCat::get_embed_languages();
 
         samples
             .iter()
