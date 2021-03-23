@@ -195,8 +195,6 @@ fn get_files_from_directory(path: &str) -> IOResult<Paths> {
 
 mod test {
     #[allow(unused_imports)]
-    use crate::default::languages;
-    #[allow(unused_imports)]
     use crate::storage::{
         get_files_from_directory, learn_from_directory,
     };
