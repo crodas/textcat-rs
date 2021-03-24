@@ -1,6 +1,6 @@
 use std::env;
 use std::io;
-use textcat::default::TextCat;
+use textcat::embed::TextCat;
 use textcat::storage::load;
 
 fn main() {
@@ -34,7 +34,7 @@ mod test {
     #[allow(unused_imports)]
     use std::io::BufReader;
     #[allow(unused_imports)]
-    use textcat::default::TextCat;
+    use textcat::embed::TextCat;
 
     #[derive(Deserialize, Serialize)]
     struct Samples {

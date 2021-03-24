@@ -12,7 +12,7 @@ pub enum Language {
 }
 
 impl Language {
-    fn name(&self) -> &'static str {
+    pub fn name(&self) -> &'static str {
         match self {
             {% for lang in languages %}
             Self::{{lang|capitalize}} => "{{lang}}",{% endfor %}
