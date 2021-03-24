@@ -120,9 +120,16 @@ impl Ngrams {
         let text_length = text.len();
 
         for i in 0..text_length {
-            for len in 2..(length + 1) {
+            for len in 1..(length + 1) {
                 if i + len > text_length {
                     break;
+                }
+
+                if len == 1
+                    && (text[i].is_numeric()
+                        || text[i].is_ascii_punctuation())
+                {
+                    continue;
                 }
 
                 let ngram = String::from_iter(&text[i..i + len]);
@@ -198,7 +205,7 @@ mod tests {
             4,
         );
 
-        assert_eq!(146, ngrams.len());
+        assert_eq!(160, ngrams.len());
     }
 
     #[test]
@@ -207,7 +214,7 @@ mod tests {
             &"hi there, this is a test. Something else needs to be done.".to_string(),
             4,
         );
-        assert_eq!(4, ngrams.get(0).value());
+        assert_eq!(10, ngrams.get(0).value());
         assert_eq!(
             2,
             ngrams.ngram(&"is".to_string()).unwrap().value()
@@ -224,7 +231,7 @@ mod tests {
             &"hi there, this is a test. Something else needs to be done.".to_string(),
             4,
         );
-        assert_eq!("_t", ngrams.get(0).ngram());
+        assert_eq!("e", ngrams.get(0).ngram());
     }
 
     #[test]
@@ -235,6 +242,6 @@ mod tests {
         );
         assert_eq!(true, ngrams.ngram(&"notf".to_string()).is_none());
         assert_eq!(true, ngrams.ngram(&"this".to_string()).is_some());
-        assert_eq!(Some(0), ngrams.position(&"_t".to_string()))
+        assert_eq!(Some(5), ngrams.position(&"_t".to_string()))
     }
 }
