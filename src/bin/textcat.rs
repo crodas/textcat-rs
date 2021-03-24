@@ -46,8 +46,7 @@ mod test {
     fn test_list_of_samples() {
         let file = File::open("tests/samples.json").unwrap();
         let reader = BufReader::new(file);
-        let samples: Vec<Samples> =
-            serde_json::from_reader(reader).unwrap();
+        let samples: Vec<Samples> = serde_json::from_reader(reader).unwrap();
 
         let textcat = TextCat::get_embed_languages();
 
