@@ -21,7 +21,7 @@ fn main() {
     context.insert("languages", &_p.categories());
     context.insert("version", &env!("CARGO_PKG_VERSION").to_string());
 
-    File::create("../src/default.rs")
+    File::create("../src/embed.rs")
         .unwrap()
         .write_all(tera.render("embed", &context).unwrap().as_bytes())
         .unwrap();

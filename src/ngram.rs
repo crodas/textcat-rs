@@ -45,8 +45,7 @@ impl<'de> Deserialize<'de> for Ngrams {
     where
         D: Deserializer<'de>,
     {
-        let ngrams: Vec<Ngram> =
-            Deserialize::deserialize(deserializer)?;
+        let ngrams: Vec<Ngram> = Deserialize::deserialize(deserializer)?;
         Ok(Ngrams::from_vec(ngrams))
     }
 }
@@ -86,10 +85,7 @@ impl Ngrams {
     }
 
     pub fn from_vec_str(ngrams: Vec<&str>) -> Ngrams {
-        let ngrams = ngrams
-            .iter()
-            .map(|w| Ngram((w.to_string(), 0)))
-            .collect();
+        let ngrams = ngrams.iter().map(|w| Ngram((w.to_string(), 0))).collect();
 
         Self::from_vec(ngrams)
     }
@@ -120,9 +116,15 @@ impl Ngrams {
         let text_length = text.len();
 
         for i in 0..text_length {
-            for len in 2..(length + 1) {
+            for len in 1..(length + 1) {
                 if i + len > text_length {
                     break;
+                }
+
+                if len == 1
+                    && (text[i].is_numeric() || text[i].is_ascii_punctuation())
+                {
+                    continue;
                 }
 
                 let ngram = String::from_iter(&text[i..i + len]);
@@ -148,11 +150,7 @@ impl Ngrams {
     pub fn distance(&self, another: &Ngrams) -> u64 {
         self.ngrams
             .iter()
-            .map(|n| {
-                another
-                    .position(n.ngram())
-                    .map_or(5000_u64, |v| v as u64)
-            })
+            .map(|n| another.position(n.ngram()).map_or(5000_u64, |v| v as u64))
             .sum()
     }
 
@@ -194,47 +192,45 @@ mod tests {
     #[test]
     fn length() {
         let ngrams = Ngrams::new(
-            &"hi there, this is a test. Something else needs to be done.".to_string(),
+            &"hi there, this is a test. Something else needs to be done."
+                .to_string(),
             4,
         );
 
-        assert_eq!(146, ngrams.len());
+        assert_eq!(160, ngrams.len());
     }
 
     #[test]
     fn get_count() {
         let ngrams = Ngrams::new(
-            &"hi there, this is a test. Something else needs to be done.".to_string(),
+            &"hi there, this is a test. Something else needs to be done."
+                .to_string(),
             4,
         );
-        assert_eq!(4, ngrams.get(0).value());
-        assert_eq!(
-            2,
-            ngrams.ngram(&"is".to_string()).unwrap().value()
-        );
-        assert_eq!(
-            1,
-            ngrams.ngram(&"this".to_string()).unwrap().value()
-        );
+        assert_eq!(10, ngrams.get(0).value());
+        assert_eq!(2, ngrams.ngram(&"is".to_string()).unwrap().value());
+        assert_eq!(1, ngrams.ngram(&"this".to_string()).unwrap().value());
     }
 
     #[test]
     fn get_by_position() {
         let ngrams = Ngrams::new(
-            &"hi there, this is a test. Something else needs to be done.".to_string(),
+            &"hi there, this is a test. Something else needs to be done."
+                .to_string(),
             4,
         );
-        assert_eq!("_t", ngrams.get(0).ngram());
+        assert_eq!("e", ngrams.get(0).ngram());
     }
 
     #[test]
     fn search() {
         let ngrams = Ngrams::new(
-            &"hi there, this is a test. Something else needs to be done.".to_string(),
+            &"hi there, this is a test. Something else needs to be done."
+                .to_string(),
             4,
         );
         assert_eq!(true, ngrams.ngram(&"notf".to_string()).is_none());
         assert_eq!(true, ngrams.ngram(&"this".to_string()).is_some());
-        assert_eq!(Some(0), ngrams.position(&"_t".to_string()))
+        assert_eq!(Some(5), ngrams.position(&"_t".to_string()))
     }
 }

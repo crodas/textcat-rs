@@ -1,6 +1,6 @@
 use std::env;
 use std::io;
-use textcat::default::TextCat;
+use textcat::embed::TextCat;
 use textcat::storage::load;
 
 fn main() {
@@ -34,7 +34,7 @@ mod test {
     #[allow(unused_imports)]
     use std::io::BufReader;
     #[allow(unused_imports)]
-    use textcat::default::TextCat;
+    use textcat::embed::TextCat;
 
     #[derive(Deserialize, Serialize)]
     struct Samples {
@@ -46,8 +46,7 @@ mod test {
     fn test_list_of_samples() {
         let file = File::open("tests/samples.json").unwrap();
         let reader = BufReader::new(file);
-        let samples: Vec<Samples> =
-            serde_json::from_reader(reader).unwrap();
+        let samples: Vec<Samples> = serde_json::from_reader(reader).unwrap();
 
         let textcat = TextCat::get_embed_languages();
 
