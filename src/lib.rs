@@ -1,3 +1,3 @@
 pub mod embed;
-mod ngram;
+pub mod ngram;
 pub mod storage;

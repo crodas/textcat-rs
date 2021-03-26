@@ -103,7 +103,7 @@ impl FileContent {
 
     /// Returns a sorted list of categories which are candidates and their score (the lower the better)
     pub fn get_categories(&self, sample: &str) -> Option<Vec<(String, u64)>> {
-        let ngrams = Ngrams::new(sample, 4);
+        let ngrams = Ngrams::new(sample, 5);
 
         let mut categories = self
             .categories
