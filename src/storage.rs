@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{BufReader, Error, ErrorKind, Read, Write};
 
-pub type IOResult<T> = std::result::Result<T, Error>;
+pub type IoResult<T> = std::result::Result<T, Error>;
 
 #[derive(Serialize, Deserialize)]
 struct Category {
@@ -126,7 +126,7 @@ impl FileContent {
     }
 
     /// Stores the categories in a JSON file.
-    pub fn persist(&self, output: &str) -> IOResult<()> {
+    pub fn persist(&self, output: &str) -> IoResult<()> {
         let j = serde_json::to_string(&self)?;
         File::create(output)?.write_all(j.as_bytes())?;
         Ok(())
@@ -146,7 +146,7 @@ impl FileContent {
 }
 
 /// Loads categories stored from a file.
-pub fn load(path: &str) -> IOResult<FileContent> {
+pub fn load(path: &str) -> IoResult<FileContent> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     let u = serde_json::from_reader(reader)?;
@@ -156,7 +156,7 @@ pub fn load(path: &str) -> IOResult<FileContent> {
 
 /// Learn categories from a given directory. In the directory all the files
 /// should have a 'sample' extensions.
-pub fn learn_from_directory(path: &str) -> IOResult<FileContent> {
+pub fn learn_from_directory(path: &str) -> IoResult<FileContent> {
     let files = get_files_from_directory(path)?;
     let mut content = FileContent::new();
 
@@ -179,7 +179,7 @@ pub fn learn_from_directory(path: &str) -> IOResult<FileContent> {
 }
 
 /// Returns all sample files in a given directory
-fn get_files_from_directory(path: &str) -> IOResult<Paths> {
+fn get_files_from_directory(path: &str) -> IoResult<Paths> {
     glob(format!("{}/*.sample", path).as_str())
         .map_err(|_p| Error::new(ErrorKind::InvalidData, "invalid data"))
 }
