@@ -105,7 +105,11 @@ impl Ngrams {
 
     /// Splits the texts from ngrams, from start to end length. NGrams are in their own
     /// vector grouped by length.
-    pub fn split_and_group_by_ngrams(text: &str, start: usize, end: usize) -> Vec<Vec<String>> {
+    pub fn split_and_group_by_ngrams(
+        text: &str,
+        start: usize,
+        end: usize,
+    ) -> Vec<Vec<String>> {
         let text: Vec<char> = text
             .to_lowercase()
             .unicode_words()
@@ -117,7 +121,7 @@ impl Ngrams {
 
         let text_length = text.len();
 
-        for len in start .. end {
+        for len in start..end {
             let mut ngrams = Vec::new();
 
             for i in 0..text_length {
