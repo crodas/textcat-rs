@@ -103,9 +103,13 @@ impl Ngrams {
         Ngrams { ngrams, index }
     }
 
-    /// Creates a HashMap of text -> count
-    fn parse_text(text: &str, length: usize) -> HashMap<String, u64> {
-        let mut ngrams: HashMap<String, u64> = HashMap::new();
+    /// Splits the texts from ngrams, from start to end length. NGrams are in their own
+    /// vector grouped by length.
+    pub fn split_and_group_by_ngrams(
+        text: &str,
+        start: usize,
+        end: usize,
+    ) -> Vec<Vec<String>> {
         let text: Vec<char> = text
             .to_lowercase()
             .unicode_words()
@@ -113,10 +117,14 @@ impl Ngrams {
             .chars()
             .collect::<Vec<_>>();
 
+        let mut ngrams_set = Vec::new();
+
         let text_length = text.len();
 
-        for i in 0..text_length {
-            for len in 1..(length + 1) {
+        for len in start..end {
+            let mut ngrams = Vec::new();
+
+            for i in 0..text_length {
                 if i + len > text_length {
                     break;
                 }
@@ -126,17 +134,39 @@ impl Ngrams {
                 {
                     continue;
                 }
-
                 let ngram = String::from_iter(&text[i..i + len]);
-
                 if ngram.is_empty() {
                     break;
                 }
 
-                let count = ngrams.entry(ngram).or_insert(0);
-                *count += 1;
+                ngrams.push(ngram);
             }
+
+            ngrams_set.push(ngrams);
         }
+
+        ngrams_set
+    }
+
+    /// Splits a given text into ngrams
+    pub fn split(text: &str, start: usize, end: usize) -> Vec<String> {
+        Self::split_and_group_by_ngrams(text, start, end)
+            .into_iter()
+            .flatten()
+            .collect()
+    }
+
+    /// Creates a HashMap of ngram -> count
+    pub fn parse_text(text: &str, length: usize) -> HashMap<String, u64> {
+        let mut ngrams: HashMap<String, u64> = HashMap::new();
+
+        Self::split(&text, 1, length)
+            .iter()
+            .map(|ngram| {
+                let count = ngrams.entry((&ngram).to_string()).or_insert(0);
+                *count += 1;
+            })
+            .for_each(drop);
 
         ngrams
     }
@@ -162,6 +192,11 @@ impl Ngrams {
     #[allow(dead_code)]
     pub fn len(&self) -> usize {
         self.ngrams.len()
+    }
+
+    #[allow(dead_code)]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     /// Returns the position in which a given Ngram is located
@@ -194,7 +229,7 @@ mod tests {
         let ngrams = Ngrams::new(
             &"hi there, this is a test. Something else needs to be done."
                 .to_string(),
-            4,
+            5,
         );
 
         assert_eq!(160, ngrams.len());
@@ -205,7 +240,7 @@ mod tests {
         let ngrams = Ngrams::new(
             &"hi there, this is a test. Something else needs to be done."
                 .to_string(),
-            4,
+            5,
         );
         assert_eq!(10, ngrams.get(0).value());
         assert_eq!(2, ngrams.ngram(&"is".to_string()).unwrap().value());
@@ -217,7 +252,7 @@ mod tests {
         let ngrams = Ngrams::new(
             &"hi there, this is a test. Something else needs to be done."
                 .to_string(),
-            4,
+            5,
         );
         assert_eq!("e", ngrams.get(0).ngram());
     }
@@ -227,7 +262,7 @@ mod tests {
         let ngrams = Ngrams::new(
             &"hi there, this is a test. Something else needs to be done."
                 .to_string(),
-            4,
+            5,
         );
         assert_eq!(true, ngrams.ngram(&"notf".to_string()).is_none());
         assert_eq!(true, ngrams.ngram(&"this".to_string()).is_some());

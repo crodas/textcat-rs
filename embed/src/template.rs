@@ -5,6 +5,7 @@
 /// or how to add a new language
 use crate::storage::FileContent;
 use std::str::FromStr;
+use std::fmt;
 
 pub enum Language {
     {% for lang in languages %}
@@ -19,6 +20,12 @@ impl Language {
         }
     }
 
+}
+
+impl fmt::Display for Language {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.name())
+    }
 }
 
 impl FromStr for Language {
