@@ -42,9 +42,9 @@ pub struct FileContent {
 
     /// Runtime configuration.
     ///
-    /// Minimun threshold to (1.00-1.99) to consider a match close enough from each
-    /// other. This setting can be updated with update set_threshold(3), the default
-    /// value is 3% (1.03)
+    /// Minimun threshold to (0.00-0.99) to consider a match close enough from each
+    /// other. This setting can be updated with update set_threshold(0.01), the default
+    /// value is 3% (0.03)
     #[serde(
         skip_deserializing,
         skip_serializing,
@@ -85,8 +85,18 @@ impl FileContent {
             .collect()
     }
 
+    pub fn set_threshold(&mut self, threshold: f32) -> Result<(), &str> {
+        if threshold <= 0.0 && 1.0 <= threshold {
+            return Err("The value has to between 0 and 1");
+        }
+
+        self.threshold = threshold;
+
+        Ok(())
+    }
+
     pub fn default_threshold() -> f32 {
-        1.03
+        0.03
     }
 
     /// Returns a single category for a given text. If two categories or more categories
@@ -114,7 +124,7 @@ impl FileContent {
         categories.sort_by(|a, b| a.0.cmp(&b.0));
 
         let best_candidate = categories.first()?;
-        let threshold: u64 = (self.threshold * best_candidate.0 as f32) as u64;
+        let threshold: u64 = ((1.0+self.threshold) * best_candidate.0 as f32) as u64;
 
         Some(
             categories
