@@ -1,6 +1,6 @@
 [package]
 name = "textcat"
-version = "0.1.4"
+version = "0.1.5"
 license = "MIT"
 description = "Simple library to detect text categories. It can be used to detect the language of a given text"
 repository  = "https://github.com/crodas/textcat-rs"
