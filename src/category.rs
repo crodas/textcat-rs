@@ -87,13 +87,16 @@ where
     threshold: f32,
 }
 
-impl<T> From<Vec<Category<T>>> for Categories<T>
+impl<T> From<Vec<(T, Vec<&str>)>> for Categories<T>
 where
     for<'a> T: PartialEq<T> + Serialize + Deserialize<'a> + Clone,
 {
-    fn from(categories: Vec<Category<T>>) -> Self {
+    fn from(categories: Vec<(T, Vec<&str>)>) -> Self {
         let mut new = Self::new();
-        new.categories = categories;
+        new.categories = categories
+            .iter()
+            .map(|m| m.to_owned().into())
+            .collect::<Vec<Category<T>>>();
         new
     }
 }
