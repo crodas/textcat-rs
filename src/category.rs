@@ -1,7 +1,7 @@
-//! Storage module
+//! Category module
 //!
-//! This module is an storage module. It makes easier to serialize and deserialize list of ngrams by
-//! their category
+//! This module groups sets of ngrams and their category into categories. This is useful to try
+//! unknown texts and see to which pre-trained category it belongs.
 use crate::ngram::Ngrams;
 use glob::{glob, Paths};
 use serde::{Deserialize, Serialize};
@@ -34,20 +34,24 @@ where
     ngrams: Ngrams,
 }
 
+impl<T> From<(T, Vec<&str>)> for Category<T>
+where
+    for<'a> T: PartialEq<T> + Serialize + Deserialize<'a> + Clone,
+{
+    fn from(value: (T, Vec<&str>)) -> Category<T> {
+        Self {
+            name: value.0,
+            ngrams: value.1.into(),
+        }
+    }
+}
+
 impl<T> Category<T>
 where
     for<'a> T: PartialEq<T> + Serialize + Deserialize<'a> + Clone,
 {
     pub fn distance(&self, ngrams: &Ngrams) -> u64 {
         self.ngrams.distance(ngrams)
-    }
-
-    /// Creates a struct from a vector (the output of self.to_vec())
-    pub fn from_vec(name: T, ngrams: Vec<&str>) -> Self {
-        Category {
-            name: name,
-            ngrams: Ngrams::from_vec_str(ngrams),
-        }
     }
 
     /// Exports the current structure as a vector
@@ -59,7 +63,7 @@ where
 /// This structure is the serialized/unserialized sorted first N n-grams from a text.
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(bound = "T: Serialize, for<'a> T: Deserialize<'a>")]
-pub struct FileContent<T>
+pub struct Categories<T>
 where
     for<'a> T: PartialEq<T> + Serialize + Deserialize<'a> + Clone,
 {
@@ -84,30 +88,14 @@ where
 }
 
 #[allow(clippy::new_without_default)]
-impl<T> FileContent<T>
+impl<T> Categories<T>
 where
     for<'a> T: PartialEq<T> + Serialize + Deserialize<'a> + Clone,
 {
-    /// Creates a new instance of FileContent
-    pub fn new() -> FileContent<T> {
-        FileContent {
+    /// Creates a new instance of Categories
+    pub fn new() -> Categories<T> {
+        Categories {
             categories: Vec::new(),
-            version: env!("CARGO_PKG_VERSION").to_string(),
-            threshold: DEFAULT_THRESHOLD,
-        }
-    }
-
-    /// Converts an vector into a struct (the output of self.to_vec())
-    pub fn from_vec(data: Vec<(T, Vec<&str>)>) -> FileContent<T> {
-        let categories = data
-            .iter()
-            .map(|(name, ngrams)| {
-                Category::from_vec(name.clone(), ngrams.to_vec())
-            })
-            .collect();
-
-        FileContent {
-            categories,
             version: env!("CARGO_PKG_VERSION").to_string(),
             threshold: DEFAULT_THRESHOLD,
         }
@@ -191,7 +179,7 @@ where
 }
 
 /// Loads categories stored from a file.
-pub fn load<T>(path: &str) -> IoResult<FileContent<T>>
+pub fn load<T>(path: &str) -> IoResult<Categories<T>>
 where
     for<'a> T: PartialEq<T> + Serialize + Deserialize<'a> + Clone,
 {
@@ -204,9 +192,9 @@ where
 
 /// Learn categories from a given directory. In the directory all the files
 /// should have a 'sample' extensions.
-pub fn learn_from_directory(path: &str) -> IoResult<FileContent<String>> {
+pub fn learn_from_directory(path: &str) -> IoResult<Categories<String>> {
     let files = get_files_from_directory(path)?;
-    let mut content = FileContent::new();
+    let mut content = Categories::new();
 
     for p in files {
         let mut buf: Vec<u8> = Vec::new();
@@ -233,7 +221,7 @@ fn get_files_from_directory(path: &str) -> IoResult<Paths> {
 
 #[cfg(test)]
 mod test {
-    use crate::storage::{get_files_from_directory, learn_from_directory};
+    use super::*;
 
     #[test]
     fn test_files_listing_in_path() {
