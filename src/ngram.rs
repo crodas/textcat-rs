@@ -51,13 +51,35 @@ pub struct Ngrams {
     index: HashMap<String, usize>,
 }
 
+impl From<Vec<&str>> for Ngrams {
+    fn from(value: Vec<&str>) -> Self {
+        value
+            .iter()
+            .map(|w| Ngram((w.to_string(), 0)))
+            .collect::<Vec<Ngram>>()
+            .into()
+    }
+}
+
+impl From<Vec<Ngram>> for Ngrams {
+    fn from(ngrams: Vec<Ngram>) -> Self {
+        let mut index = HashMap::new();
+
+        for (pos, ngram) in ngrams.iter().enumerate() {
+            index.entry(ngram.ngram().clone()).or_insert(pos);
+        }
+
+        Ngrams { ngrams, index }
+    }
+}
+
 impl<'de> Deserialize<'de> for Ngrams {
     fn deserialize<D>(deserializer: D) -> Result<Ngrams, D::Error>
     where
         D: Deserializer<'de>,
     {
         let ngrams: Vec<Ngram> = Deserialize::deserialize(deserializer)?;
-        Ok(Ngrams::from_vec(ngrams))
+        Ok(ngrams.into())
     }
 }
 
@@ -88,32 +110,12 @@ impl Ngrams {
             }
         });
 
-        Ngrams::from_vec(ngrams)
+        ngrams.into()
     }
 
     /// Returns a vector of strings of ngrams sorted by the rank
     pub fn to_vec(&self) -> Vec<&str> {
         self.ngrams.iter().map(|w| w.0 .0.as_str()).collect()
-    }
-
-    /// Creates a new instance from a vector of ngrams
-    pub fn from_vec_str(ngrams: Vec<&str>) -> Ngrams {
-        let ngrams = ngrams.iter().map(|w| Ngram((w.to_string(), 0))).collect();
-
-        Self::from_vec(ngrams)
-    }
-
-    /// Takes a vector of Ngram and builds an index, useful to locate Ngrams quickly
-    /// using a hash. This should be called from the deserializer or automatically
-    /// from the constructor _if_ we are parsing a new text.
-    fn from_vec(ngrams: Vec<Ngram>) -> Ngrams {
-        let mut index = HashMap::new();
-
-        for (pos, ngram) in ngrams.iter().enumerate() {
-            index.entry(ngram.ngram().clone()).or_insert(pos);
-        }
-
-        Ngrams { ngrams, index }
     }
 
     /// Splits the texts from ngrams, from start to end length. NGrams are in their own
@@ -247,8 +249,17 @@ mod tests {
             5,
         );
         assert_eq!(10, ngrams.get_by_position(0).expect("first ngram").score());
-        assert_eq!(2, ngrams.ngram(&"is".to_string()).expect("find ngram").score());
-        assert_eq!(1, ngrams.ngram(&"this".to_string()).expect("find ngram").score());
+        assert_eq!(
+            2,
+            ngrams.ngram(&"is".to_string()).expect("find ngram").score()
+        );
+        assert_eq!(
+            1,
+            ngrams
+                .ngram(&"this".to_string())
+                .expect("find ngram")
+                .score()
+        );
     }
 
     #[test]
@@ -258,7 +269,13 @@ mod tests {
                 .to_string(),
             5,
         );
-        assert_eq!("e", ngrams.get_by_position(0).expect("find ngram by position").ngram());
+        assert_eq!(
+            "e",
+            ngrams
+                .get_by_position(0)
+                .expect("find ngram by position")
+                .ngram()
+        );
     }
 
     #[test]

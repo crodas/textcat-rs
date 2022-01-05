@@ -1,21 +1,10 @@
 # textcat-rs
-N-Gram-Based Text Categorization with built-in support for natural language detection.
 
+Library to extract N-Grams from texts. This is a low level library.
+[Lingo](https://github.com/crodas/lingo-rs) is build on top of this library to
+detect human languages on texts.
 
-## Usage - Natural language.
-
-```rust
-use textcat::embed::TextCat;
-
-fn main() {
-    let textcat  = TextCat::new();
-    let text     = "Hi there, this is a simple text written in what language?";
-    let language = textcat.get_language(text).unwrap();
-
-    println!("\"{}\" is written in \"{}\"", text, language);
-}
-```
-
-### Adding support for languages.
-
-Adding support to new languages is quite trivial. Add a new sample file in `embed/samples` and run `cargo run` in the `embed` sub-project. This step will [embed the new features for the new language](https://github.com/crodas/textcat-rs/blob/develop/src/embed.rs).
+This library provides tools to train with sample texts, extracting N-Grams from
+texts, create sample and train categories. The trained data can be serialized to
+be used later. The library also provides tools to detect to which pretained
+category a given text would be closer to.
