@@ -1,5 +1,5 @@
 use std::env;
-use textcat::storage::learn_from_directory;
+use textcat::category::learn_from_directory;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
