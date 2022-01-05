@@ -87,6 +87,17 @@ where
     threshold: f32,
 }
 
+impl<T> From<Vec<Category<T>>> for Categories<T>
+where
+    for<'a> T: PartialEq<T> + Serialize + Deserialize<'a> + Clone,
+{
+    fn from(categories: Vec<Category<T>>) -> Self {
+        let mut new = Self::new();
+        new.categories = categories;
+        new
+    }
+}
+
 #[allow(clippy::new_without_default)]
 impl<T> Categories<T>
 where
