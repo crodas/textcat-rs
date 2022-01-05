@@ -1,17 +1,26 @@
+//! # NGram
+//!
+//! NGram module. This module is responsible for parsing and sorting ngrams from texts.
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::min;
 use std::collections::HashMap;
 use std::iter::FromIterator;
 use unicode_segmentation::UnicodeSegmentation;
 
+/// Ngram structure
+///
+/// An ngram is a tuple the ngram (string) and its score
+#[derive(Debug, Clone)]
 pub struct Ngram((String, u64));
 
 impl Ngram {
-    fn ngram(&self) -> &String {
+    /// Returns a reference to the ngram
+    pub fn ngram(&self) -> &String {
         &self.0 .0
     }
 
-    fn value(&self) -> u64 {
+    /// Returns the score of the ngram
+    pub fn score(&self) -> u64 {
         self.0 .1
     }
 }
@@ -35,6 +44,8 @@ impl<'de> Deserialize<'de> for Ngram {
     }
 }
 
+/// Set of ngrams
+#[derive(Debug, Clone)]
 pub struct Ngrams {
     ngrams: Vec<Ngram>,
     index: HashMap<String, usize>,
@@ -63,27 +74,29 @@ impl Serialize for Ngrams {
 impl Ngrams {
     /// Creates a new Ngrams structure from a given text
     /// (the ngrams length are from 2 ... length).
-    pub fn new(text: &str, length: i8) -> Ngrams {
+    pub fn new(text: &str, length: u8) -> Ngrams {
         let mut ngrams = Ngrams::parse_text(text, length as usize)
             .into_iter()
             .map(Ngram)
             .collect::<Vec<Ngram>>();
 
         ngrams.sort_by(|a, b| {
-            if a.value() == b.value() {
+            if a.score() == b.score() {
                 b.ngram().cmp(&a.ngram())
             } else {
-                b.value().cmp(&a.value())
+                b.score().cmp(&a.score())
             }
         });
 
         Ngrams::from_vec(ngrams)
     }
 
+    /// Returns a vector of strings of ngrams sorted by the rank
     pub fn to_vec(&self) -> Vec<&str> {
         self.ngrams.iter().map(|w| w.0 .0.as_str()).collect()
     }
 
+    /// Creates a new instance from a vector of ngrams
     pub fn from_vec_str(ngrams: Vec<&str>) -> Ngrams {
         let ngrams = ngrams.iter().map(|w| Ngram((w.to_string(), 0))).collect();
 
@@ -184,17 +197,17 @@ impl Ngrams {
             .sum()
     }
 
-    #[allow(dead_code)]
-    pub fn get(&self, pos: usize) -> &Ngram {
-        &self.ngrams[pos]
+    /// Gets an ngram by their position
+    pub fn get_by_position(&self, pos: usize) -> Option<&Ngram> {
+        self.ngrams.get(pos)
     }
 
-    #[allow(dead_code)]
+    /// Returns the a length of ngarms
     pub fn len(&self) -> usize {
         self.ngrams.len()
     }
 
-    #[allow(dead_code)]
+    /// Returns true if the ngrams has a length of 0.
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
@@ -202,26 +215,17 @@ impl Ngrams {
     /// Returns the position in which a given Ngram is located
     /// in the ranking or None if it is not found.
     pub fn position(&self, ngram: &str) -> Option<usize> {
-        if let Some(pos) = self.index.get(ngram) {
-            return Some(*pos);
-        }
-
-        None
+        self.index.get(ngram).map(|pos| *pos)
     }
 
     /// Search for an ngram and returns the Ngram struct or None.
-    #[allow(dead_code)]
     fn ngram(&self, ngram: &str) -> Option<&Ngram> {
-        if let Some(pos) = self.index.get(ngram) {
-            return Some(&self.ngrams[*pos]);
-        }
-
-        None
+        self.index.get(ngram).map(|pos| &self.ngrams[*pos])
     }
 }
 
+#[cfg(test)]
 mod tests {
-    #[allow(unused_imports)]
     use crate::ngram::Ngrams;
 
     #[test]
@@ -242,9 +246,9 @@ mod tests {
                 .to_string(),
             5,
         );
-        assert_eq!(10, ngrams.get(0).value());
-        assert_eq!(2, ngrams.ngram(&"is".to_string()).unwrap().value());
-        assert_eq!(1, ngrams.ngram(&"this".to_string()).unwrap().value());
+        assert_eq!(10, ngrams.get_by_position(0).expect("first ngram").score());
+        assert_eq!(2, ngrams.ngram(&"is".to_string()).expect("find ngram").score());
+        assert_eq!(1, ngrams.ngram(&"this".to_string()).expect("find ngram").score());
     }
 
     #[test]
@@ -254,7 +258,7 @@ mod tests {
                 .to_string(),
             5,
         );
-        assert_eq!("e", ngrams.get(0).ngram());
+        assert_eq!("e", ngrams.get_by_position(0).expect("find ngram by position").ngram());
     }
 
     #[test]
